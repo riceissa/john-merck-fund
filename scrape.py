@@ -18,6 +18,7 @@ def main():
     # 447 of 447" then it should be "447".
     for i in range(1, int(sys.argv[1]) + 1):
         url = url_pattern.format(i)
+        print("Downloading " + url, file=sys.stderr)
         response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 '
                                               '(X11; Linux x86_64) AppleWebKit/537.36 '
                                               '(KHTML, like Gecko) '
@@ -29,13 +30,25 @@ def main():
             cells = row.find_all("td")
 
             lst = cells[1].find_all("p")
-            assert len(lst) == 1
-            description = lst[0].text
+            # Our life is much easier if we don't have to deal with
+            # multiple-paragraph descriptions; it looks like none of the
+            # descriptions have multiple paragraphs, but make this assertion to
+            # be sure
+            assert len(lst) == 0 or len(lst) == 1 or (len(lst) == 2 and lst[1].text.strip() == "")
+            if len(lst) == 0:
+                description = ""
+            else:
+                description = lst[0].text
+
+            try:
+                donee_url = cells[1].h3.a.get("href")
+            except AttributeError:
+                donee_url = ""
 
             writer.writerow({
                 "date": cells[0].text,
                 "donee": cells[1].h3.text,
-                "donee_url": cells[1].h3.a.get("href"),
+                "donee_url": donee_url,
                 "description": description,
                 "program_area": cells[2].text.strip(),
                 "focus": cells[3].text.strip(),
