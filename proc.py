@@ -18,7 +18,7 @@ def main():
                 mysql_quote("John Merck Fund"),  # donor
                 mysql_quote(row["donee"]),  # donee
                 str(amount),  # amount
-                mysql_quote(datetime.datetime.striptime(row["date"], "%m/%Y").strftime("%Y-%m-%d")),  # donation_date
+                mysql_quote(datetime.datetime.strptime(row["date"], "%m/%Y").strftime("%Y-%m-%d")),  # donation_date
                 mysql_quote("month"),  # donation_date_precision
                 mysql_quote("donation log"),  # donation_date_basis
                 mysql_quote(row["program_area"]),  # cause_area
